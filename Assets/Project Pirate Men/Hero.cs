@@ -7,21 +7,42 @@ namespace ProjectPirateMen
     public class Hero : MonoBehaviour
     {
         [SerializeField] private float _speed = 1f;
+        [SerializeField] private float _jumpPower = 1f;
+        [SerializeField] private LayerMask _groundLayer;
 
+        [SerializeField] private float _groundCheckRadius = .5f;
+        [SerializeField] private Vector3 _groundCheckPositionDelta;
+
+
+        private Rigidbody2D _rigidbody;
         private Vector2 _direction;
 
-        private void Update()
+        private void Awake()
         {
-            Movement();
+            _rigidbody = GetComponent<Rigidbody2D>();
         }
 
-        public void Movement()
+        private void FixedUpdate()
         {
-            if (_direction.magnitude > 0)
+            _rigidbody.velocity = new Vector2(_direction.x * _speed, _rigidbody.velocity.y);
+
+            var isJumping = _direction.y > 0;
+            if (isJumping && IsGrounded())
             {
-                var delta = _direction * _speed * Time.deltaTime;
-                transform.position += new Vector3(delta.x, delta.y, transform.position.z);
+                _rigidbody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = IsGrounded() ? Color.green : Color.red;
+            Gizmos.DrawSphere(transform.position + _groundCheckPositionDelta, _groundCheckRadius);
+        }
+
+        private bool IsGrounded()
+        {
+            var hit = Physics2D.CircleCast(transform.position + _groundCheckPositionDelta, _groundCheckRadius, Vector2.down, 0f, _groundLayer);
+            return hit.collider != null;
         }
 
         public void SetDirection(Vector2 direction)
@@ -29,10 +50,9 @@ namespace ProjectPirateMen
             _direction = direction;
         }
 
-
         public void SaySomething()
         {
-            Debug.Log("Something!");
+            Debug.Log("Say something");
         }
     }
 }
