@@ -17,6 +17,8 @@ namespace ProjectPirateMen
         private Rigidbody2D _rigidbody;
         private Vector2 _direction;
 
+        public int _coins { get; private set; }
+
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
@@ -53,6 +55,12 @@ namespace ProjectPirateMen
         public void SaySomething()
         {
             Debug.Log("Say something");
+        }
+
+        public void AddCoins(int coins)
+        {
+            _coins += coins;
+            Debug.Log($"{coins} coins added. total coins: {_coins}");
         }
     }
 }
